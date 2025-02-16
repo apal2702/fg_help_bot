@@ -1,0 +1,52 @@
+schema:
+  description: The configuration schema for FG Assistant
+  properties:
+    app_port:
+      description: Dropwizard application port
+      type: integer
+    admin_port:
+      description: Dropwizard admin port
+      type: integer
+    realm:
+      description: AWS realm
+      type: string
+    environment:
+      description: AWS environment
+      type: string
+    log_level:
+      description: Application Log level, values [OFF, ERROR, WARN, INFO, DEBUG, TRACE, ALL]
+      default: INFO
+      enum: [OFF, ERROR, WARN, INFO, DEBUG, TRACE, ALL]
+    host_sid:
+      description: Host identifier
+      type: string
+    rollbar_enabled:
+      description: Enable rollbar
+      type: boolean
+      default: false
+    redis_cluster_connection:
+      description: Should be false for SINGLE single redis server or true CLUSTER for group of nodes
+      type: boolean
+      default: true
+    redis_cluster_endpoints:
+      description: Comma separated list of Redis URIs to be used with the form redis://host:port
+      type: string
+    ato_request_limit:
+      description: Limit of request allowed per account for ATO fields
+      type: integer
+      default: 7500
+    kafka_enabled:
+      description: Should be true to enable kafka writes
+      type: boolean
+      default: true
+
+  required:
+   - app_port
+   - admin_port
+   - realm
+   - environment
+   - host_sid
+   - rollbar_enabled
+   - redis_cluster_connection
+   - redis_cluster_endpoints
+   - three_service_notification_url

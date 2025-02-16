@@ -1,0 +1,7 @@
+presto-python-client==0.8.3
+numpy
+pandas
+streamlit
+plotly
+scikit-learn
+ollama

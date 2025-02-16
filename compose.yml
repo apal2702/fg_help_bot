@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  web:
+    build: app
+    ports:
+      - 8080:8080
+    volumes:
+      - ./app:/app
+    networks:
+      - tutorial-net
+  ollama:
+    build: ollama
+    ports:
+      - 11434:11434
+    volumes:
+      - tutorial-vol:/ollama
+    networks:
+      - tutorial-net
+    entrypoint: ["/usr/bin/bash", "/pull-llama3.sh"]
+
+networks:
+  tutorial-net:
+    driver: bridge
+
+volumes:
+  tutorial-vol:
+    driver: local
