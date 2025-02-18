@@ -19,7 +19,7 @@ class AccountInfo:
     def presto_conn(self):    
         role = 'accsec-ai-playground'
         config = load_config(role)
-        presto_username, presto_password = 'svc.accsecaiuser' , load_credentials(config["presto_creds"])
+        presto_username, presto_password = load_credentials(config["presto_creds"])
         conn = Connections()
         conn.presto_connector(presto_username, presto_password)
 

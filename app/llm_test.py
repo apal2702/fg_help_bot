@@ -9,7 +9,8 @@ from langchain.memory import ChatMessageHistory
 from app.agents.fg_agents import Agent , local_llm_with_history, call_chatgpt_model
 
 os.environ['OPENAI_API_KEY'] = 'sk-proj-lhm1tMlkwAXI'
-
+ollama_models = ['deepseek-r1', 'llama3.1', 'mistral']
+openai_models = ['gpt-4o-mini', 'gpt-3.5-turbo-0125']
 # Define schema for Accounts information
 class Account(BaseModel):
     account_sid: str
@@ -215,135 +216,107 @@ def agent4_inaction(response, model,schema):
     
     return final_response
 
+def llm_test():
+    #st.set_page_config(layout="wide")  # Increase overall size for window
 
-ollama_models = ['deepseek-r1', 'llama3.1', 'mistral']
-openai_models = ['gpt-4o-mini', 'gpt-3.5-turbo-0125']
+    page = st.sidebar.selectbox(
+        "Select a page",
+            ["FG Agents Testing", "PromptTesting"] #"Threshold Override", "mlops_v2","mlops_v2_metrics"]
+    )
+    if page == "PromptTesting":
+        st.title("Prompt Testing with different Model Comparison: ")
+        prompt = st.text_area("Enter your Prompt:", height=100)  # Increase height for text input
+        query_input = st.text_area("Enter your query:", height=100)  # Increase height for text input   
 
-query = """We'd appreciate your support reviewing the following acct. We received an internal update from NOC as they still observing metrics degrading since January 11th. 
-          The cx has FG to Max. We have seen an uptick towards UA. Could you please help us take a look? Thank you in advanced!
-          ASID: ACCCC12123123123123123123
-        """
+        model_select = st.multiselect("Select Models", ollama_models + openai_models)
+        columns = st.columns(len(model_select) if model_select else 1)
 
-#response = run_agents(query)
+        button = st.button("Run Agents")
 
-st.set_page_config(layout="wide")  # Increase overall size for window
+        if button:
+            history = ChatMessageHistory()
+            for i, col in enumerate(columns):
+                with col:
+                    model = model_select[i]
+                    
+                    if model in ollama_models:
+                        st.subheader("OLLAMA Model: ")
+                        st.subheader(model,divider=True)
+                        response = local_llm_with_history(query_input, prompt , history, model) 
+                    elif model in openai_models:
+                        st.subheader("CHATGPT Model: ")
+                        st.subheader(model,divider=True)
+                        response = call_chatgpt_model(prompt + query_input, model) 
+                    st.write(response)
 
-page = st.sidebar.selectbox(
-    "Select a page",
-        ["Home","FG Bot Agents", "PromptTest"] #"Threshold Override", "mlops_v2","mlops_v2_metrics"]
-)
-if page == "PromptTest":
-    st.title("Prompt Testing with different Model Comparison: ")
-    prompt = st.text_area("Enter your Prompt:", height=100)  # Increase height for text input
-    query_input = st.text_area("Enter your query:", height=100)  # Increase height for text input   
+    elif page == "FG Agents Testing":
+            
+        st.title("FG Agent with Model Comparison: ")
 
-    model_select = st.multiselect("Select Models", ollama_models + openai_models)
-    columns = st.columns(len(model_select) if model_select else 1)
+        query_input = st.text_input("Enter your query:")  # Increase height for text input
 
-    button = st.button("Run Agents")
+        model_select = st.multiselect("Select Models", ollama_models + openai_models)
+        columns = st.columns(len(model_select) if model_select else 1)
 
+        button = st.button("Run Agents")
 
-    if button:
-        history = ChatMessageHistory()
-        for i, col in enumerate(columns):
-            with col:
-                model = model_select[i]
-                
-                #response = run_agents(query_input)
-                # Display results for the selected model -> 
-                if model in ollama_models:
-                    #agent = Agent(query_input, model, openai_flag=False)
-                    st.subheader("OLLAMA Model: ")
+        if button:
+            demo_ephemeral_chat_history_for_chain = ChatMessageHistory()
+            for i, col in enumerate(columns):
+                with col:
+                    model = model_select[i]
+                    
+                    if model in ollama_models:
+                        agent = Agent(query_input, model, demo_ephemeral_chat_history_for_chain,False)
+                        st.subheader("OLLAMA Model: ") 
+                    elif model in openai_models:
+                        agent = Agent(query, model, demo_ephemeral_chat_history_for_chain,True)
+                        st.subheader("CHATGPT Model: ") 
                     st.subheader(model,divider=True)
-                    response = local_llm_with_history(query_input, prompt , history, model) 
-                elif model in openai_models:
-                    #agent = Agent(query_input, model, openai_flag=True)
-                    st.subheader("CHATGPT Model: ")
-                    st.subheader(model,divider=True)
-                    response = call_chatgpt_model(prompt + query_input, model) 
-                st.write(response)
 
-elif page == "FG Bot Agents":
-        
-    st.title("FG Agent with Model Comparison: ")
+                    st.subheader("🤖 Summary Agent:")
+                    summary_response = agent.summary_agent()
+                    st.markdown(":red[Summary Agent tried to summarize the response to include all relevant details.] ")
+                    st.write(summary_response)
 
-    query_input = st.text_input("Enter your query:")  # Increase height for text input
+                    ## Agent 1 Extract info and Send to Agent 4 to extract info - 
+                    st.subheader("🤖 Agent 1:")
+                    agent1_response = agent.fgagent1()    
+                    st.markdown(":red[Agent 1 tried to extract meaningful info like Acc sid, Country, MCC_MNC, Date, Error Code etc..] ")
+                    ## Pass this to another function extract info from it
+                    extracted_fields = agent.json_response_agent(agent1_response,Account)
+                    print(extracted_fields)
+                    st.write("Account SID : " + extracted_fields.account_sid)
+                    st.write("Country : " + str(extracted_fields.country))
+                    st.write("DATE : " + str(extracted_fields.date))
+                    st.write("MCC : " + str(extracted_fields.mcc))
+                    st.write("Error Code : " + str(extracted_fields.error_code))
 
-    model_select = st.multiselect("Select Models", ollama_models + openai_models)
-    columns = st.columns(len(model_select) if model_select else 1)
+                    ## Agent 2 to extract Product
+                    ## Agent 2 Extract info and Send to Agent 4 to extract info - 
+                    st.subheader("🤖 Agent 2:")
+                    agent2_response = agent.fgagent2()
+                    st.markdown(":red[Agent 2 tried to detect Product] ")
+                    ## Pass this to another function extract info from it
+                    extracted_fields = agent.json_response_agent(agent2_response,Product)
+                    print(extracted_fields)
+                    st.write("Product:"+ str(extracted_fields.result))
 
-    button = st.button("Run Agents")
+                    ## Agent 3 to extract Product
+                    ## Agent 3 Extract info and Send to Agent 4 to extract info - 
+                    st.subheader("🤖 Agent 3:")
+                    agent3_response = agent.fgagent3()
+                    st.markdown(":red[Agent 3 tried to understand Issues] ")
+                    ## Pass this to another function extract info from it
+                    extracted_fields = agent.json_response_agent(agent3_response,Issue)
+                    print(extracted_fields)
+                    st.write("Category:" + str(extracted_fields.category))
+                    st.write("Reason:" + str(extracted_fields.reason))
 
-
-    if button:
-        demo_ephemeral_chat_history_for_chain = ChatMessageHistory()
-        for i, col in enumerate(columns):
-            with col:
-                model = model_select[i]
-                
-                #response = run_agents(query_input)
-                # Display results for the selected model -> 
-                if model in ollama_models:
-                    #agent = Agent(query_input, model, openai_flag=False)
-                    agent = Agent(query_input, model, demo_ephemeral_chat_history_for_chain,False)
-                    st.subheader("OLLAMA Model: ") 
-                elif model in openai_models:
-                    #agent = Agent(query_input, model, openai_flag=True)
-                    agent = Agent(query, model, demo_ephemeral_chat_history_for_chain,True)
-                    st.subheader("CHATGPT Model: ") 
-                st.subheader(model,divider=True)
-
-                st.subheader("🤖 Summary Agent:")
-                summary_response = agent.summary_agent()
-                st.markdown(":red[Summary Agent tried to summarize the response to include all relevant details.] ")
-                st.write(summary_response)
-
-                ## Agent 1 Extract info and Send to Agent 4 to extract info - 
-                st.subheader("🤖 Agent 1:")
-                agent1_response = agent.fgagent1()    
-                st.markdown(":red[Agent 1 tried to extract meaningful info like Acc sid, Country, MCC_MNC, Date, Error Code etc..] ")
-                ## Pass this to another function extract info from it
-                extracted_fields = agent.json_response_agent(agent1_response,Account)
-                print(extracted_fields)
-                #st.write(extracted_fields)
-                st.write("Account SID : " + extracted_fields.account_sid)
-                st.write("Country : " + str(extracted_fields.country))
-                st.write("DATE : " + str(extracted_fields.date))
-                st.write("MCC : " + str(extracted_fields.mcc))
-                st.write("Error Code : " + str(extracted_fields.error_code))
-
-                ## Agent 2 to extract Product
-                ## Agent 2 Extract info and Send to Agent 4 to extract info - 
-                st.subheader("🤖 Agent 2:")
-                agent2_response = agent.fgagent2()
-                st.markdown(":red[Agent 2 tried to detect Product] ")
-                ## Pass this to another function extract info from it
-                extracted_fields = agent.json_response_agent(agent2_response,Product)
-                print(extracted_fields)
-                #st.write(extracted_fields)
-                st.write("Product:"+ str(extracted_fields.result))
-
-                ## Agent 3 to extract Product
-                ## Agent 3 Extract info and Send to Agent 4 to extract info - 
-                st.subheader("🤖 Agent 3:")
-                agent3_response = agent.fgagent3()
-                st.markdown(":red[Agent 3 tried to understand Issues] ")
-                ## Pass this to another function extract info from it
-                extracted_fields = agent.json_response_agent(agent3_response,Issue)
-                print(extracted_fields)
-                #st.write(extracted_fields)
-                st.write("Category:" + str(extracted_fields.category))
-                st.write("Reason:" + str(extracted_fields.reason))
-
-                ## Take Action
-                ## Check Account SID
-                def check_account_sid_format(account_sid):
-                    if len(account_sid) == 34 and account_sid.startswith("AC"):
-                        return True
-                    else:
-                        return False
-
-                #if check_account_sid_format(extracted_fields.account_sid):
-                #    st.write("Account SID format is correct.")
-                #else:
-                #    st.write("Account SID format is incorrect.")
+                    ## Take Action
+                    ## Check Account SID
+                    def check_account_sid_format(account_sid):
+                        if len(account_sid) == 34 and account_sid.startswith("AC"):
+                            return True
+                        else:
+                            return False

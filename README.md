@@ -1,68 +1,89 @@
-Streamlit App with Ollama
 
-This guide will help you set up and run a Streamlit app that utilizes Ollama for LLM-based tasks. Follow the steps below to install dependencies and launch the app.
+# Streamlit App with Ollama
 
-Prerequisites
+This repository provides a guide to set up and run a Streamlit application that integrates **Ollama** for Large Language Model (LLM)-based tasks. The application leverages Ollama's models like Llama 3.1 and Mistral to perform various LLM tasks.
 
-Ensure you have the following installed:
+## Prerequisites
 
-Python 3.8 or later
+Before you begin, ensure you have the following installed:
 
-pip (Python package manager)
+- **Python 3.8 or later**
+- **pip** (Python package manager)
 
-Installation Steps
+## Installation Steps
 
-1. Install Ollama
+Follow the steps below to get the app up and running:
 
-Ollama is required to run large language models. Install it using the following command:
+### 1. Install Ollama
 
+Ollama is required to run large language models. Install Ollama by running the following command:
+
+```bash
 curl -fsSL https://ollama.com/install.sh | sh
+```
 
-Alternatively, you can visit Ollama's official website for installation instructions based on your operating system.
+Alternatively, visit the [Ollama website](https://ollama.com) for platform-specific installation instructions.
 
-2. Pull Required Ollama Models
+### 2. Pull the Required Ollama Models
 
-Pull the necessary LLM models like Llama 3.1 and Mistral:
+Pull the necessary LLM models such as Llama 3.1 and Mistral:
 
-ollama pull llama3
+```bash
+ollama pull llama3.1
 ollama pull mistral
+ollama run deepseek-r1
+```
 
 This ensures that the models are downloaded and ready for use in the application.
 
-3. Install Python Dependencies
+### 3. Install Python Dependencies
 
-Navigate to the project directory and install the required Python packages:
+Navigate to the project directory and install the required Python dependencies by running:
 
+```bash
 pip install -r requirements.txt
+```
 
-4. Run the Streamlit App
+### 4. Run the Streamlit App
 
-Once the dependencies are installed, start the Streamlit app using:
+After installing the dependencies, run the Streamlit app with the following command:
 
-python3 -m streamlit run app/fg_bot_app.py
+```bash
+python3 -m streamlit run main_app.py
+```
 
-This will launch the web app, which can be accessed in your browser at http://localhost:8501/.
+This will start the web app, which can be accessed in your browser at [http://localhost:8501/](http://localhost:8501/).
 
-Troubleshooting
+## Troubleshooting
 
-If you encounter missing dependencies, try running:
+If you encounter issues during setup, try the following steps:
 
-pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
+- **Missing dependencies**: Upgrade your `pip`, `setuptools`, and `wheel`, and then reinstall the dependencies:
 
-Ensure that Ollama is running by executing:
+  ```bash
+  pip install --upgrade pip setuptools wheel
+  pip install -r requirements.txt
+  ```
 
-ollama list
+- **Ollama not running**: Make sure Ollama is running by executing:
 
-If no models appear, try re-pulling them.
+  ```bash
+  ollama list
+  ```
 
-If the app fails to launch, check the Streamlit logs for errors and verify that all dependencies are correctly installed.
+  If no models appear, try re-pulling them:
 
-Contributing
+  ```bash
+  ollama pull llama3
+  ollama pull mistral
+  ```
 
-Feel free to submit issues or pull requests if you improve or extend the app.
+- **Streamlit app fails to launch**: Check the Streamlit logs for error details and ensure all dependencies are installed correctly.
 
-License
+## Contributing
 
-This project is licensed under the MIT License.
+We welcome contributions to improve or extend the app. If you have ideas for improvements, please feel free to submit an issue or a pull request.
 
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
