@@ -17,7 +17,7 @@ class FGAccountStatus:
 
     def is_account_active(self,account_sid):
         query = f""" select * from accsecai.dsg_all_account_features 
-                                where account_sid = '{account_sid}' order by data_load_date desc limit 1
+                                where account_sid = '{account_sid}' and data_load_date > date('2025-02-20') order by data_load_date desc limit 1
                 """
         
         df = self.conn.run_query(query)
@@ -111,10 +111,8 @@ class SPPAccountStatus:
     def __init__(self, conn):
         self.conn = conn
     def is_account_active_on_psms(self,account_sid):
-        query = f"""
-                select *  
-                    FROM accsecai.dsg_active_psms_accounts
-                      WHERE account_sid = '{account_sid}'
+        query = f""" select * from accsecai.dsg_all_account_features 
+                                where account_sid = '{account_sid}' and data_load_date > date('2025-02-20') order by data_load_date desc limit 1
                 """
         df= self.conn.run_query(query)
         print(df)

@@ -21,6 +21,8 @@ def load_config(role):
         config_filepath = env + "_test_" + "config.toml"
     elif role == 'test':
         config_filepath = "test_" + "config.toml"
+    elif role == 'local':
+        config_filepath = "local_" + "config.toml"
     else:
         config_filepath = "_" + "config.toml"
 

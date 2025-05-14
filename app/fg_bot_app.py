@@ -13,7 +13,7 @@ from app.agents.main_agent import MainAgent, get_agent_responses,convert_respons
 def fg_bot_app():
 
     
-    ollama_models = ['llama3.1', 'mistral','deepseek-r1¸','deepseek-r1:14b', ]
+    ollama_models = ['llama3.1', 'mistral','deepseek-r1','deepseek-r1:14b', ]
     openai_models = ['gpt-4o-mini', 'gpt-3.5-turbo-0125']
     
     # Global dictionary to persist responses

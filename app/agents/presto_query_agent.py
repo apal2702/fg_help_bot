@@ -1,7 +1,7 @@
 
 import os
 import sys
-from app.src.utils.config import load_config, load_credentials, load_rollbar_token
+#from app.src.utils.config import load_config, load_credentials, load_rollbar_token
 from app.src.connector.connections import Connections
 from app.src.fg_spp_data_queries import FGAccountStatus, SPPAccountStatus
 import plotly.subplots as sp
@@ -17,10 +17,10 @@ class AccountInfo:
         self.st = st
 
     def presto_conn(self):    
-        role = 'accsec-ai-playground'
-        config = load_config(role)
-        presto_username, presto_password = load_credentials(config["presto_creds"])
-        conn = Connections()
+        #role = 'local'
+        #config = load_config(role)
+        presto_username, presto_password = load_credentials(["presto_creds"])
+        conn = Connections() 
         conn.presto_connector(presto_username, presto_password)
 
         return conn

@@ -13,7 +13,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
-os.environ['OPENAI_API_KEY'] = 'sk-proj-lhm1tMlkwAXIF'
+os.environ['OPENAI_API_KEY'] = 'sk-proj-l............................'
 
 ollama_models = ['deepseek-r1:14b', 'llama3.1', 'mistral']
 openai_models = ['gpt-4o-mini', 'gpt-3.5-turbo-0125']
